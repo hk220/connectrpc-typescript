@@ -1,18 +1,10 @@
-import { fastify } from "fastify"
-import { fastifyConnectPlugin } from "@connectrpc/connect-fastify"
+import http from "http"
+import express from "express"
 import routes from "./connect"
+import { expressConnectMiddleware } from "@connectrpc/connect-express"
 
-async function main() {
-    const server = fastify()
-    await server.register(fastifyConnectPlugin, {
-        routes,
-    })
-    server.get("/", (_, reply) => {
-        reply.type("text/plain")
-        reply.send("Hello World!")
-    })
-    await server.listen({ host: "localhost", port: 8080 })
-    console.log("server is listening at", server.addresses())
-}
+const app = express()
 
-void main()
+app.use(expressConnectMiddleware({ routes }))
+
+http.createServer(app).listen(8080)
